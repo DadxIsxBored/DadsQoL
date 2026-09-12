@@ -25,6 +25,7 @@ if ($Package) {
         'CHANGELOG.md' = (Join-Path $root 'CHANGELOG.md')
         'LICENSE' = (Join-Path $root 'LICENSE')
         'THIRD_PARTY.md' = (Join-Path $root 'THIRD_PARTY.md')
+        'MassFarming-LICENSE.txt' = (Join-Path $root 'THIRD_PARTY_LICENSES\MassFarming-LICENSE.txt')
     }
 
     foreach ($sourcePath in $packageEntries.Values) {
@@ -61,9 +62,9 @@ if ($Package) {
     New-Item -ItemType Directory -Path $artifactArchiveRoot -Force | Out-Null
 
     $zipPath = Join-Path $distRoot "DadsQoL-$($manifest.version_number).zip"
-    if (Test-Path -LiteralPath $zipPath -PathType Leaf) {
+    foreach ($previousZip in Get-ChildItem -LiteralPath $distRoot -File -Filter 'DadsQoL-*.zip') {
         $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
-        Move-Item -LiteralPath $zipPath -Destination (Join-Path $artifactArchiveRoot "DadsQoL-$($manifest.version_number)-$stamp.zip")
+        Move-Item -LiteralPath $previousZip.FullName -Destination (Join-Path $artifactArchiveRoot "$($previousZip.BaseName)-$stamp.zip")
     }
 
     $zip = [System.IO.Compression.ZipFile]::Open($zipPath, [System.IO.Compression.ZipArchiveMode]::Create)

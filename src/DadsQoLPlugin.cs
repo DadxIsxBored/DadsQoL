@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
+using UnityEngine;
 
 namespace DadsQoL;
 
@@ -14,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.1.0";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ConfigEntry<bool> CarryWeightEnabled = null!;
@@ -22,6 +23,16 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     internal static ConfigEntry<bool> PickupRadiusEnabled = null!;
     internal static ConfigEntry<float> PickupRadius = null!;
     internal static ConfigEntry<bool> EquipmentInWaterEnabled = null!;
+    internal static ConfigEntry<bool> MassFarmingEnabled = null!;
+    internal static ConfigEntry<KeyboardShortcut> MassFarmingKeyboardShortcut = null!;
+    internal static ConfigEntry<KeyboardShortcut> MassFarmingControllerShortcut = null!;
+    internal static ConfigEntry<float> MassHarvestRadius = null!;
+    internal static ConfigEntry<int> PlantGridWidth = null!;
+    internal static ConfigEntry<int> PlantGridLength = null!;
+    internal static ConfigEntry<bool> IgnorePlantingStamina = null!;
+    internal static ConfigEntry<bool> IgnorePlantingDurability = null!;
+    internal static ConfigEntry<bool> CenterPlantingGridWidth = null!;
+    internal static ConfigEntry<bool> CenterPlantingGridLength = null!;
 
     private Harmony? _harmony;
 
@@ -61,6 +72,57 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
             true,
             "Allow tools, weapons, shields, bows, and other hand equipment to remain usable while swimming.");
 
+        MassFarmingEnabled = Config.Bind(
+            "5 - Mass Farming",
+            "Enabled",
+            true,
+            "Enable mass harvesting and grid planting.");
+        MassFarmingKeyboardShortcut = Config.Bind(
+            "5 - Mass Farming",
+            "Keyboard Shortcut",
+            new KeyboardShortcut(KeyCode.LeftShift),
+            "Hold while harvesting or planting to use mass farming.");
+        MassFarmingControllerShortcut = Config.Bind(
+            "5 - Mass Farming",
+            "Controller Shortcut",
+            new KeyboardShortcut(KeyCode.JoystickButton4),
+            "Hold while harvesting or planting to use mass farming with a controller.");
+        MassHarvestRadius = Config.Bind(
+            "5 - Mass Farming",
+            "Harvest Radius",
+            5f,
+            "Radius in meters for harvesting matching pickables and extracting nearby beehives.");
+        PlantGridWidth = Config.Bind(
+            "5 - Mass Farming",
+            "Plant Grid Width",
+            5,
+            "Number of plants across the grid.");
+        PlantGridLength = Config.Bind(
+            "5 - Mass Farming",
+            "Plant Grid Length",
+            5,
+            "Number of plants along the grid.");
+        IgnorePlantingStamina = Config.Bind(
+            "5 - Mass Farming",
+            "Ignore Planting Stamina",
+            false,
+            "Do not consume stamina for the additional plants.");
+        IgnorePlantingDurability = Config.Bind(
+            "5 - Mass Farming",
+            "Ignore Planting Durability",
+            false,
+            "Do not consume cultivator durability for the additional plants.");
+        CenterPlantingGridWidth = Config.Bind(
+            "5 - Mass Farming",
+            "Center Grid Width",
+            true,
+            "Center the grid across the first plant instead of extending to one side.");
+        CenterPlantingGridLength = Config.Bind(
+            "5 - Mass Farming",
+            "Center Grid Length",
+            true,
+            "Center the grid along the first plant instead of extending forward.");
+
         ModEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadiusEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadius.SettingChanged += OnPickupSettingChanged;
@@ -80,12 +142,39 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 
     private void OnDestroy()
     {
+        MassFarming.MassPlantingState.DestroyGhosts();
         _harmony?.UnpatchSelf();
     }
 
     internal static bool FeatureEnabled(ConfigEntry<bool> feature)
     {
         return ModEnabled.Value && feature.Value;
+    }
+
+    internal static bool MassFarmingActive => FeatureEnabled(MassFarmingEnabled);
+
+    internal static bool MassFarmingShortcutHeld()
+    {
+        return ShortcutHeld(MassFarmingKeyboardShortcut.Value) ||
+               ShortcutHeld(MassFarmingControllerShortcut.Value);
+    }
+
+    private static bool ShortcutHeld(KeyboardShortcut shortcut)
+    {
+        if (shortcut.MainKey == KeyCode.None || !Input.GetKey(shortcut.MainKey))
+        {
+            return false;
+        }
+
+        foreach (KeyCode modifier in shortcut.Modifiers)
+        {
+            if (!Input.GetKey(modifier))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 

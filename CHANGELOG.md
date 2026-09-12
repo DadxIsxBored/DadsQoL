@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+- Added mass harvesting for matching nearby pickables.
+- Added mass extraction for nearby accessible beehives.
+- Added configurable grid planting with placement previews.
+- Added keyboard and controller shortcuts.
+- Added configurable harvest radius, grid dimensions, anchoring, stamina use, and durability use.
+
 ## 1.0.0
 
 - Added configurable base carry weight.
