@@ -1,0 +1,9 @@
+{
+  "name": "DadsQoL",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/DadxIsxBored/DadsQoL",
+  "description": "Configurable carry weight, pickup radius, and equipment use while swimming for Valheim 1.0.12.",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2350"
+  ]
+}
