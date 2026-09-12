@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>DadsQoL</AssemblyName>
     <RootNamespace>DadsQoL</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>true</Deterministic>
     <DebugType>portable</DebugType>

@@ -13,3 +13,10 @@ The mass-farming implementation is adapted from Xeio's MassFarming source under 
 - Source: https://github.com/Xeio/MassFarming
 - Thunderstore: https://thunderstore.io/c/valheim/p/MainStreetGaming/MassFarming/
 - Retained license: `THIRD_PARTY_LICENSES/MassFarming-LICENSE.txt`
+
+The eternal-fuel feature scope was checked against FuelEternal by Marf:
+
+- Source: https://github.com/thejhoffman/FuelEternal
+- Thunderstore: https://thunderstore.io/c/valheim/p/Marf/FuelEternal/
+
+FuelEternal's public repository contains no license file. No FuelEternal source, binary, or artwork is included in DadsQoL; the DadsQoL implementation is newly written against Valheim 1.0.12.

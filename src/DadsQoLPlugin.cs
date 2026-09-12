@@ -10,12 +10,11 @@ using UnityEngine;
 namespace DadsQoL;
 
 [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-[BepInProcess("valheim.exe")]
 public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.1.0";
+    public const string PluginVersion = "1.2.0";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ConfigEntry<bool> CarryWeightEnabled = null!;
@@ -33,6 +32,24 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     internal static ConfigEntry<bool> IgnorePlantingDurability = null!;
     internal static ConfigEntry<bool> CenterPlantingGridWidth = null!;
     internal static ConfigEntry<bool> CenterPlantingGridLength = null!;
+    internal static ConfigEntry<bool> EternalFuelEnabled = null!;
+    internal static ConfigEntry<bool> EternalCampfires = null!;
+    internal static ConfigEntry<bool> EternalBonfires = null!;
+    internal static ConfigEntry<bool> EternalHearths = null!;
+    internal static ConfigEntry<bool> EternalSconces = null!;
+    internal static ConfigEntry<bool> EternalStandingIronTorches = null!;
+    internal static ConfigEntry<bool> EternalStandingWoodTorches = null!;
+    internal static ConfigEntry<bool> EternalStandingGreenTorches = null!;
+    internal static ConfigEntry<bool> EternalStandingBlueTorches = null!;
+    internal static ConfigEntry<bool> EternalStandingBraziers = null!;
+    internal static ConfigEntry<bool> EternalHangingBraziers = null!;
+    internal static ConfigEntry<bool> EternalJackOTurnips = null!;
+    internal static ConfigEntry<bool> EternalStoneOvens = null!;
+    internal static ConfigEntry<bool> EternalHotTubs = null!;
+    internal static ConfigEntry<bool> EternalSmelters = null!;
+    internal static ConfigEntry<bool> EternalBlastFurnaces = null!;
+    internal static ConfigEntry<bool> EternalEitrRefineries = null!;
+    internal static ConfigEntry<string> EternalCustomPrefabs = null!;
 
     private Harmony? _harmony;
 
@@ -122,6 +139,29 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
             "Center Grid Length",
             true,
             "Center the grid along the first plant instead of extending forward.");
+
+        EternalFuelEnabled = Config.Bind("6 - Eternal Fuel", "Enabled", true, "Keep selected fuel-burning pieces fully fueled.");
+        EternalCampfires = Config.Bind("6 - Eternal Fuel", "Campfires", true, "Keep campfires fueled.");
+        EternalBonfires = Config.Bind("6 - Eternal Fuel", "Bonfires", true, "Keep bonfires fueled.");
+        EternalHearths = Config.Bind("6 - Eternal Fuel", "Hearths", true, "Keep hearths fueled.");
+        EternalSconces = Config.Bind("6 - Eternal Fuel", "Sconces", true, "Keep wall sconces fueled.");
+        EternalStandingIronTorches = Config.Bind("6 - Eternal Fuel", "Standing Iron Torches", true, "Keep standing iron torches fueled.");
+        EternalStandingWoodTorches = Config.Bind("6 - Eternal Fuel", "Standing Wood Torches", true, "Keep standing wood torches fueled.");
+        EternalStandingGreenTorches = Config.Bind("6 - Eternal Fuel", "Standing Green Torches", true, "Keep green-burning standing torches fueled.");
+        EternalStandingBlueTorches = Config.Bind("6 - Eternal Fuel", "Standing Blue Torches", true, "Keep blue-burning standing torches fueled.");
+        EternalStandingBraziers = Config.Bind("6 - Eternal Fuel", "Standing Braziers", true, "Keep standing braziers fueled.");
+        EternalHangingBraziers = Config.Bind("6 - Eternal Fuel", "Hanging Braziers", true, "Keep hanging braziers fueled.");
+        EternalJackOTurnips = Config.Bind("6 - Eternal Fuel", "Jack-o-turnips", true, "Keep jack-o-turnips fueled.");
+        EternalStoneOvens = Config.Bind("6 - Eternal Fuel", "Stone Ovens", true, "Keep stone ovens fueled.");
+        EternalHotTubs = Config.Bind("6 - Eternal Fuel", "Hot Tubs", true, "Keep hot tubs fueled.");
+        EternalSmelters = Config.Bind("6 - Eternal Fuel", "Smelters", false, "Keep smelters fueled.");
+        EternalBlastFurnaces = Config.Bind("6 - Eternal Fuel", "Blast Furnaces", false, "Keep blast furnaces fueled.");
+        EternalEitrRefineries = Config.Bind("6 - Eternal Fuel", "Eitr Refineries", false, "Keep eitr refineries fueled.");
+        EternalCustomPrefabs = Config.Bind(
+            "6 - Eternal Fuel",
+            "Custom Prefabs",
+            string.Empty,
+            "Comma-separated exact prefab names whose Fireplace, CookingStation, or Smelter fuel must remain full.");
 
         ModEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadiusEnabled.SettingChanged += OnPickupSettingChanged;

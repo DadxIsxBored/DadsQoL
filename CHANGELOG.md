@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Added configurable eternal fuel for supported fireplaces, torches, braziers, cooking stations, hot tubs, and processing stations.
+- Added exact prefab-name support for custom fueled pieces.
+- Retained standard defaults: smelters, blast furnaces, and eitr refineries are disabled until configured.
+
 ## 1.1.0
 
 - Added mass harvesting for matching nearby pickables.

@@ -61,12 +61,24 @@ if ($Package) {
     New-Item -ItemType Directory -Path $distRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $artifactArchiveRoot -Force | Out-Null
 
-    $zipPath = Join-Path $distRoot "DadsQoL-$($manifest.version_number).zip"
-    foreach ($previousZip in Get-ChildItem -LiteralPath $distRoot -File -Filter 'DadsQoL-*.zip') {
-        $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
-        Move-Item -LiteralPath $previousZip.FullName -Destination (Join-Path $artifactArchiveRoot "$($previousZip.BaseName)-$stamp.zip")
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
+    foreach ($artifact in Get-ChildItem -LiteralPath $distRoot -Force) {
+        $archiveName = if ($artifact.PSIsContainer) {
+            "$($artifact.Name)-$stamp"
+        }
+        else {
+            "$($artifact.BaseName)-$stamp$($artifact.Extension)"
+        }
+        Move-Item -LiteralPath $artifact.FullName -Destination (Join-Path $artifactArchiveRoot $archiveName)
     }
 
+    $folderPath = Join-Path $distRoot "DadsQoL-$($manifest.version_number)"
+    New-Item -ItemType Directory -Path $folderPath | Out-Null
+    foreach ($entry in $packageEntries.GetEnumerator()) {
+        Copy-Item -LiteralPath $entry.Value -Destination (Join-Path $folderPath $entry.Key)
+    }
+
+    $zipPath = Join-Path $distRoot "DadsQoL-$($manifest.version_number).zip"
     $zip = [System.IO.Compression.ZipFile]::Open($zipPath, [System.IO.Compression.ZipArchiveMode]::Create)
     try {
         foreach ($entry in $packageEntries.GetEnumerator()) {

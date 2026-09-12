@@ -1,8 +1,8 @@
 {
   "name": "DadsQoL",
-  "version_number": "1.1.0",
+  "version_number": "1.2.0",
   "website_url": "https://github.com/DadxIsxBored/DadsQoL",
-  "description": "Carry weight, pickup radius, water equipment, mass harvesting, and grid planting for Valheim 1.0.12.",
+  "description": "Carry weight, pickup radius, water equipment, mass farming, and configurable eternal fuel for Valheim 1.0.12.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2350"
   ]
