@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Rebuilt against BepInEx `5.4.23.5` from BepInExPack Valheim `5.4.2350`.
+
 ## 1.2.0
 
 - Added configurable eternal fuel for supported fireplaces, torches, braziers, cooking stations, hot tubs, and processing stations.

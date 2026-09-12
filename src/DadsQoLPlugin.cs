@@ -14,7 +14,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.2.0";
+    public const string PluginVersion = "1.2.1";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ConfigEntry<bool> CarryWeightEnabled = null!;
