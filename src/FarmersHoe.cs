@@ -9,6 +9,8 @@ namespace DadsQoL;
 internal static class FarmersHoe
 {
     private const string PrefabName = "DadsQoL_FarmersHoe_Flatten";
+    private const string PieceName = "Flatten Terrain";
+    private const string VanillaLevelPrefabName = "mud_road_v2";
     private static readonly FieldInfo NamedPrefabsField = AccessTools.Field(typeof(ZNetScene), "m_namedPrefabs");
 
     private static GameObject? _flattenPrefab;
@@ -93,9 +95,16 @@ internal static class FarmersHoe
 
     private static GameObject? FindLevelTemplate(PieceTable table)
     {
+        GameObject? template = table.m_pieces.FirstOrDefault(piece =>
+            piece != null && piece.name == VanillaLevelPrefabName);
+        if (template != null)
+        {
+            return template;
+        }
+
         return table.m_pieces.FirstOrDefault(piece =>
         {
-            TerrainOp? operation = piece == null ? null : piece.GetComponent<TerrainOp>();
+            TerrainOp? operation = piece == null ? null : piece.GetComponentInChildren<TerrainOp>(true);
             return operation != null && operation.m_settings != null && operation.m_settings.m_level;
         });
     }
@@ -135,17 +144,50 @@ internal static class FarmersHoe
         Object.DontDestroyOnLoad(prefab);
 
         Piece piece = prefab.GetComponent<Piece>();
-        piece.m_name = "Flatten Terrain";
+        piece.m_name = PieceName;
         piece.m_description = "Flatten terrain to a single plane without smoothing.";
         piece.m_enabled = true;
 
-        TerrainOp operation = prefab.GetComponent<TerrainOp>();
+        TerrainOp operation = prefab.GetComponentInChildren<TerrainOp>(true);
         operation.m_settings.m_level = true;
         operation.m_settings.m_raise = false;
         operation.m_settings.m_smooth = false;
         operation.m_settings.m_paintCleared = false;
 
         return prefab;
+    }
+}
+
+[HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.CopyOtherDB))]
+internal static class FarmersHoeObjectDbCopyPatch
+{
+    private static void Postfix(ObjectDB __instance)
+    {
+        FarmersHoe.Refresh(__instance);
+    }
+}
+
+[HarmonyPatch(typeof(PieceTable), nameof(PieceTable.UpdateAvailable))]
+internal static class FarmersHoeAvailabilityPatch
+{
+    private static void Prefix(PieceTable __instance, HashSet<string> knownRecipes, out bool __state)
+    {
+        __state = false;
+        if (!DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.FarmersHoeEnabled) ||
+            !__instance.m_pieces.Any(piece => piece != null && piece.name == "DadsQoL_FarmersHoe_Flatten"))
+        {
+            return;
+        }
+
+        __state = knownRecipes.Add("Flatten Terrain");
+    }
+
+    private static void Postfix(HashSet<string> knownRecipes, bool __state)
+    {
+        if (__state)
+        {
+            knownRecipes.Remove("Flatten Terrain");
+        }
     }
 }
 

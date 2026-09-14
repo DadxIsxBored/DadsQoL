@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1
+
+- Registered FarmersHoe after `ObjectDB.CopyOtherDB`, when Valheim's final Hoe piece table is available.
+- Located Valheim 1.0.12's `mud_road_v2` Level Ground prefab and its child `TerrainOp` component.
+- Made Flatten Terrain immediately available in the Hoe menu without permanently altering the player's known recipes.
+
 ## 1.3.0
 
 - Added `FarmersHoe`, a pure Flatten Terrain action integrated into the vanilla hoe.
