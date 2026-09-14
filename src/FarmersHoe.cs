@@ -170,7 +170,7 @@ internal static class FarmersHoeObjectDbCopyPatch
 [HarmonyPatch(typeof(PieceTable), nameof(PieceTable.UpdateAvailable))]
 internal static class FarmersHoeAvailabilityPatch
 {
-    private static void Prefix(PieceTable __instance, HashSet<string> knownRecipes, out bool __state)
+    private static void Prefix(PieceTable __instance, HashSet<string> __0, out bool __state)
     {
         __state = false;
         if (!DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.FarmersHoeEnabled) ||
@@ -179,14 +179,14 @@ internal static class FarmersHoeAvailabilityPatch
             return;
         }
 
-        __state = knownRecipes.Add("Flatten Terrain");
+        __state = __0.Add("Flatten Terrain");
     }
 
-    private static void Postfix(HashSet<string> knownRecipes, bool __state)
+    private static void Postfix(HashSet<string> __0, bool __state)
     {
         if (__state)
         {
-            knownRecipes.Remove("Flatten Terrain");
+            __0.Remove("Flatten Terrain");
         }
     }
 }

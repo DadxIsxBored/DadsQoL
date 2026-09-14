@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.2
+
+- Changed the FarmersHoe `PieceTable.UpdateAvailable` hook to Harmony's positional argument binding so it matches Valheim 1.0.12's `knownRecipies` parameter.
+- Restored complete DadsQoL Harmony initialization when FarmersHoe is enabled.
+
 ## 1.3.1
 
 - Registered FarmersHoe after `ObjectDB.CopyOtherDB`, when Valheim's final Hoe piece table is available.
