@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 
@@ -14,9 +15,10 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.2.1";
+    public const string PluginVersion = "1.3.0";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
+    internal static ManualLogSource ModLog = null!;
     internal static ConfigEntry<bool> CarryWeightEnabled = null!;
     internal static ConfigEntry<float> CarryWeight = null!;
     internal static ConfigEntry<bool> PickupRadiusEnabled = null!;
@@ -50,11 +52,13 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     internal static ConfigEntry<bool> EternalBlastFurnaces = null!;
     internal static ConfigEntry<bool> EternalEitrRefineries = null!;
     internal static ConfigEntry<string> EternalCustomPrefabs = null!;
+    internal static ConfigEntry<bool> FarmersHoeEnabled = null!;
 
     private Harmony? _harmony;
 
     private void Awake()
     {
+        ModLog = Logger;
         ModEnabled = Config.Bind(
             "1 - General",
             "Enabled",
@@ -163,9 +167,16 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
             string.Empty,
             "Comma-separated exact prefab names whose Fireplace, CookingStation, or Smelter fuel must remain full.");
 
+        FarmersHoeEnabled = Config.Bind(
+            "7 - FarmersHoe",
+            "Enabled",
+            true,
+            "Add the pure Flatten Terrain action to the vanilla hoe.");
+
         ModEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadiusEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadius.SettingChanged += OnPickupSettingChanged;
+        FarmersHoeEnabled.SettingChanged += OnFarmersHoeSettingChanged;
 
         _harmony = new Harmony(PluginGuid);
         _harmony.PatchAll(typeof(DadsQoLPlugin).Assembly);
@@ -178,6 +189,11 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
         {
             PlayerAwakePatch.Apply(Player.m_localPlayer);
         }
+    }
+
+    private static void OnFarmersHoeSettingChanged(object sender, EventArgs eventArgs)
+    {
+        FarmersHoe.Refresh();
     }
 
     private void OnDestroy()

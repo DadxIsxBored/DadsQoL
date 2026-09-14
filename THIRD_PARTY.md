@@ -20,3 +20,9 @@ The eternal-fuel feature scope was checked against FuelEternal by Marf:
 - Thunderstore: https://thunderstore.io/c/valheim/p/Marf/FuelEternal/
 
 FuelEternal's public repository contains no license file. No FuelEternal source, binary, or artwork is included in DadsQoL; the DadsQoL implementation is newly written against Valheim 1.0.12.
+
+The FarmersHoe feature scope was checked against MyDirtyHoe by MagicMike:
+
+- Thunderstore: https://thunderstore.io/c/valheim/p/MagicMike/MyDirtyHoe/
+
+No MyDirtyHoe source, binary, asset bundle, artwork, translation, or Jotunn dependency is included. FarmersHoe is newly written against Valheim 1.0.12 and adds only a pure flattening action to the vanilla hoe.

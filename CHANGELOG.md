@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0
+
+- Added `FarmersHoe`, a pure Flatten Terrain action integrated into the vanilla hoe.
+- Retained the vanilla hoe's placement, stamina, durability, and access rules.
+- Added no other MyDirtyHoe terrain, paint, radius, reset, command, tool, or status-effect features.
+- Kept DadsQoL dependent only on BepInEx.
+
 ## 1.2.1
 
 - Rebuilt against BepInEx `5.4.23.5` from BepInExPack Valheim `5.4.2350`.
