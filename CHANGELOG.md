@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.3
+
+- Removed FarmersHoe completely, including its Hoe piece-table changes, terrain-operation prefab, Harmony patches, configuration entry, and network registration.
+- Restored ownership of the vanilla Hoe menu and terrain actions to Valheim and other installed mods.
+
 ## 1.3.2
 
 - Changed the FarmersHoe `PieceTable.UpdateAvailable` hook to Harmony's positional argument binding so it matches Valheim 1.0.12's `knownRecipies` parameter.
