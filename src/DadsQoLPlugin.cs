@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.4";
+    public const string PluginVersion = "1.3.5";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -264,20 +264,7 @@ internal static class AutoPickupCapacityPatch
         }
 
         Inventory inventory = __instance.GetInventory();
-        if (inventory == null || inventory.HaveEmptySlot())
-        {
-            return true;
-        }
-
-        foreach (ItemDrop.ItemData item in inventory.GetAllItems())
-        {
-            if (item?.m_shared != null && item.m_shared.m_maxStackSize > 1 && item.m_stack < item.m_shared.m_maxStackSize)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return inventory == null || inventory.HaveEmptySlot();
     }
 }
 

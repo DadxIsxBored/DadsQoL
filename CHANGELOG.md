@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.5
+
+- Stopped the automatic-pickup scan whenever no ordinary inventory slot is empty, even when an existing stack is below its maximum size.
+
 ## 1.3.4
 
 - Stopped the automatic-pickup scan when the player inventory has no empty slot and no partial stack with remaining capacity.
