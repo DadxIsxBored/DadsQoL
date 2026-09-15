@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.3";
+    public const string PluginVersion = "1.3.4";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -250,6 +250,34 @@ internal static class PlayerAwakePatch
         player.m_autoPickupRange = DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.PickupRadiusEnabled)
             ? Math.Max(0f, DadsQoLPlugin.PickupRadius.Value)
             : original.Value;
+    }
+}
+
+[HarmonyPatch(typeof(Player), "AutoPickup")]
+internal static class AutoPickupCapacityPatch
+{
+    private static bool Prefix(Player __instance)
+    {
+        if (!DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.PickupRadiusEnabled) || __instance == null || __instance != Player.m_localPlayer)
+        {
+            return true;
+        }
+
+        Inventory inventory = __instance.GetInventory();
+        if (inventory == null || inventory.HaveEmptySlot())
+        {
+            return true;
+        }
+
+        foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+        {
+            if (item?.m_shared != null && item.m_shared.m_maxStackSize > 1 && item.m_stack < item.m_shared.m_maxStackSize)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

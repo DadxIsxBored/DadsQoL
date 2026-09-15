@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.4
+
+- Stopped the automatic-pickup scan when the player inventory has no empty slot and no partial stack with remaining capacity.
+- Automatic pickup resumes as soon as a slot or stack has capacity again.
+
 ## 1.3.3
 
 - Removed FarmersHoe completely, including its Hoe piece-table changes, terrain-operation prefab, Harmony patches, configuration entry, and network registration.
