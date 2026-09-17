@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.5";
+    public const string PluginVersion = "1.3.6";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -258,10 +258,13 @@ internal static class AutoPickupCapacityPatch
 {
     private static bool Prefix(Player __instance)
     {
-        if (!DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.PickupRadiusEnabled) || __instance == null || __instance != Player.m_localPlayer)
+        if (__instance == null || __instance != Player.m_localPlayer)
         {
             return true;
         }
+
+        PlayerAwakePatch.Apply(__instance);
+        if (!DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.PickupRadiusEnabled)) return true;
 
         Inventory inventory = __instance.GetInventory();
         return inventory == null || inventory.HaveEmptySlot();

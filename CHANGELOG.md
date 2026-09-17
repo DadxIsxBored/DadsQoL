@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.6
+
+- Applied the configured pickup radius to the current player immediately before each automatic-pickup scan, so in-game setting changes do not require a restart.
+
 ## 1.3.5
 
 - Stopped the automatic-pickup scan whenever no ordinary inventory slot is empty, even when an existing stack is below its maximum size.
