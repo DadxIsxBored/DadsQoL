@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.8";
+    public const string PluginVersion = "1.3.9";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -259,9 +259,10 @@ internal static class AutoPickupCapacityPatch
     private static readonly AccessTools.FieldRef<Player, Collider[]> PickupColliders =
         AccessTools.FieldRefAccess<Player, Collider[]>("m_colliders");
     private static float _nextLargeRadiusScan;
+    private static float _lastLargeRadiusScan = -1f;
     private static float _nextFullInventoryScan;
 
-    private static bool Prefix(Player __instance, out float __state)
+    private static bool Prefix(Player __instance, ref float __0, out float __state)
     {
         __state = __instance != null ? __instance.m_autoPickupRange : 0f;
         if (__instance == null || __instance != Player.m_localPlayer)
@@ -298,7 +299,11 @@ internal static class AutoPickupCapacityPatch
             }
             else
             {
-                _nextLargeRadiusScan = Time.unscaledTime + 0.5f;
+                float now = Time.unscaledTime;
+                if (_lastLargeRadiusScan >= 0f)
+                    __0 = Mathf.Max(__0, Mathf.Min(now - _lastLargeRadiusScan, 0.6f));
+                _lastLargeRadiusScan = now;
+                _nextLargeRadiusScan = now + 0.5f;
                 ref Collider[] colliders = ref PickupColliders(__instance);
                 if (colliders == null || colliders.Length < 4096)
                     colliders = new Collider[4096];

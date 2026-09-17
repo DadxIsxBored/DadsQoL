@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.9
+
+- Moved distant drops at the normal pickup speed by passing elapsed broad-scan time to Valheim's pickup routine.
+
 ## 1.3.8
 
 - Accessed Valheim's private pickup collider buffer through Harmony instead of a compile-time publicized field, preventing runtime `FieldAccessException` on broad scans.
