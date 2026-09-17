@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.6";
+    public const string PluginVersion = "1.3.7";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -256,18 +256,58 @@ internal static class PlayerAwakePatch
 [HarmonyPatch(typeof(Player), "AutoPickup")]
 internal static class AutoPickupCapacityPatch
 {
-    private static bool Prefix(Player __instance)
+    private static float _nextLargeRadiusScan;
+    private static float _nextFullInventoryScan;
+
+    private static bool Prefix(Player __instance, out float __state)
     {
+        __state = __instance != null ? __instance.m_autoPickupRange : 0f;
         if (__instance == null || __instance != Player.m_localPlayer)
         {
             return true;
         }
 
         PlayerAwakePatch.Apply(__instance);
+        __state = __instance.m_autoPickupRange;
         if (!DadsQoLPlugin.FeatureEnabled(DadsQoLPlugin.PickupRadiusEnabled)) return true;
 
         Inventory inventory = __instance.GetInventory();
-        return inventory == null || inventory.HaveEmptySlot();
+        if (inventory == null) return true;
+
+        bool hasEmptySlot = inventory.HaveEmptySlot();
+        if (!hasEmptySlot)
+        {
+            bool hasPartialStack = false;
+            foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+            {
+                if (item?.m_shared == null || item.m_stack >= item.m_shared.m_maxStackSize) continue;
+                hasPartialStack = true;
+                break;
+            }
+            if (!hasPartialStack || Time.unscaledTime < _nextFullInventoryScan) return false;
+            _nextFullInventoryScan = Time.unscaledTime + 0.5f;
+        }
+
+        if (__instance.m_autoPickupRange > 32f)
+        {
+            if (Time.unscaledTime < _nextLargeRadiusScan)
+            {
+                __instance.m_autoPickupRange = 12f;
+            }
+            else
+            {
+                _nextLargeRadiusScan = Time.unscaledTime + 0.5f;
+                if (__instance.m_colliders == null || __instance.m_colliders.Length < 4096)
+                    __instance.m_colliders = new Collider[4096];
+            }
+        }
+
+        return true;
+    }
+
+    private static void Postfix(Player __instance, float __state)
+    {
+        if (__instance != null) __instance.m_autoPickupRange = __state;
     }
 }
 

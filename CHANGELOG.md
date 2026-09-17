@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.7
+
+- Allowed automatic pickup into an existing partial stack when ordinary inventory slots are full, checking at most twice per second in that state.
+- Expanded Valheim's fixed 100-collider pickup buffer for configured radii above 32 meters and limited broad scans to twice per second while retaining nearby scans between them.
+
 ## 1.3.6
 
 - Applied the configured pickup radius to the current player immediately before each automatic-pickup scan, so in-game setting changes do not require a restart.
