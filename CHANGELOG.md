@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.8
+
+- Accessed Valheim's private pickup collider buffer through Harmony instead of a compile-time publicized field, preventing runtime `FieldAccessException` on broad scans.
+
 ## 1.3.7
 
 - Allowed automatic pickup into an existing partial stack when ordinary inventory slots are full, checking at most twice per second in that state.

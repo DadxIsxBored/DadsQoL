@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.7";
+    public const string PluginVersion = "1.3.8";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -256,6 +256,8 @@ internal static class PlayerAwakePatch
 [HarmonyPatch(typeof(Player), "AutoPickup")]
 internal static class AutoPickupCapacityPatch
 {
+    private static readonly AccessTools.FieldRef<Player, Collider[]> PickupColliders =
+        AccessTools.FieldRefAccess<Player, Collider[]>("m_colliders");
     private static float _nextLargeRadiusScan;
     private static float _nextFullInventoryScan;
 
@@ -297,8 +299,9 @@ internal static class AutoPickupCapacityPatch
             else
             {
                 _nextLargeRadiusScan = Time.unscaledTime + 0.5f;
-                if (__instance.m_colliders == null || __instance.m_colliders.Length < 4096)
-                    __instance.m_colliders = new Collider[4096];
+                ref Collider[] colliders = ref PickupColliders(__instance);
+                if (colliders == null || colliders.Length < 4096)
+                    colliders = new Collider[4096];
             }
         }
 
