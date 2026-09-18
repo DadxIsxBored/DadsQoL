@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.9";
+    public const string PluginVersion = "1.3.10";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -260,7 +260,6 @@ internal static class AutoPickupCapacityPatch
         AccessTools.FieldRefAccess<Player, Collider[]>("m_colliders");
     private static float _nextLargeRadiusScan;
     private static float _lastLargeRadiusScan = -1f;
-    private static float _nextFullInventoryScan;
 
     private static bool Prefix(Player __instance, ref float __0, out float __state)
     {
@@ -287,8 +286,11 @@ internal static class AutoPickupCapacityPatch
                 hasPartialStack = true;
                 break;
             }
-            if (!hasPartialStack || Time.unscaledTime < _nextFullInventoryScan) return false;
-            _nextFullInventoryScan = Time.unscaledTime + 0.5f;
+            // A full grid can still receive items into matching partial stacks.
+            // Keep nearby scans running so drops reach the pickup point; throttling
+            // these scans lets the enlarged broad-scan movement step overshoot it.
+            // Vanilla CanAddItem checks each drop's capacity before moving it.
+            if (!hasPartialStack) return false;
         }
 
         if (__instance.m_autoPickupRange > 32f)

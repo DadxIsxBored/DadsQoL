@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.10
+
+- Kept nearby automatic pickup scans running when all slots are occupied but existing stacks have room. Matching drops can finish moving into pickup range instead of repeatedly overshooting it on throttled scans.
+- Retained the broad-radius scan limit, per-drop capacity checks, and the stop when no empty slots or partial stacks remain.
+
 ## 1.3.9
 
 - Moved distant drops at the normal pickup speed by passing elapsed broad-scan time to Valheim's pickup routine.
