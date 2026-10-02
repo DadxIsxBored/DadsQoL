@@ -236,7 +236,7 @@ internal static class TryPlacePiecePatch
     }
 }
 
-[HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacement))]
+[HarmonyPatch(typeof(Player), "UpdatePlacement")]
 internal static class UpdatePlacementPatch
 {
     private static void Prefix(ref int ___m_placeRotation)
@@ -338,7 +338,7 @@ internal static class UpdatePlacementPatch
     }
 }
 
-[HarmonyPatch(typeof(Player), nameof(Player.SetupPlacementGhost))]
+[HarmonyPatch(typeof(Player), "SetupPlacementGhost")]
 internal static class SetupPlacementGhostPatch
 {
     private static void Prefix(int ___m_placeRotation)
@@ -359,7 +359,7 @@ internal static class SetupPlacementGhostPatch
     }
 }
 
-[HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacementGhost))]
+[HarmonyPatch(typeof(Player), "UpdatePlacementGhost")]
 internal static class UpdatePlacementGhostPatch
 {
     private static void Postfix(Player __instance)

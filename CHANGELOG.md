@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.11
+
+- Fixed mass-harvest access to Valheim's private beehive extraction method using cached reflection.
+- Compile against the installed game's original assemblies so private API calls cannot silently pass compilation.
+- Updated the package dependency to BepInExPack 5.4.2351; checked against Valheim 1.0.16.
+
 ## 1.3.10
 
 - Kept nearby automatic pickup scans running when all slots are occupied but existing stacks have room. Matching drops can finish moving into pickup range instead of repeatedly overshooting it on throttled scans.

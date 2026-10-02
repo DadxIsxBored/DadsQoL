@@ -1,6 +1,6 @@
 # DadsQoL
 
-One configurable plugin for Valheim 1.0.12:
+One configurable plugin for Valheim 1.0.16:
 
 - Base carry weight: `5000` by default.
 - Automatic pickup radius: `6` meters by default.

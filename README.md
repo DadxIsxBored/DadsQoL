@@ -1,6 +1,6 @@
 # DadsQoL
 
-DadsQoL combines configurable Valheim quality-of-life features in one Valheim 1.0.12 plugin:
+DadsQoL combines configurable Valheim quality-of-life features in one Valheim 1.0.16 plugin:
 
 - Configurable base carry weight, default `5000` (`300` is vanilla).
 - Configurable automatic pickup radius, default `6` meters (`2` is vanilla).

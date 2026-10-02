@@ -7,10 +7,11 @@ using UnityEngine;
 
 namespace DadsQoL.MassFarming;
 
-[HarmonyPatch(typeof(Player), nameof(Player.Interact))]
+[HarmonyPatch(typeof(Player), "Interact")]
 internal static class MassHarvest
 {
     private static readonly FieldInfo InteractMaskField = AccessTools.Field(typeof(Player), "m_interactMask");
+    private static readonly MethodInfo ExtractMethod = AccessTools.Method(typeof(Beehive), "Extract", System.Type.EmptyTypes);
     private static bool _processingMassInteraction;
 
     private static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
@@ -64,7 +65,7 @@ internal static class MassHarvest
                         nearbyBeehive != targetedBeehive &&
                         PrivateArea.CheckAccess(nearbyBeehive.transform.position))
                     {
-                        nearbyBeehive.Extract();
+                        ExtractMethod.Invoke(nearbyBeehive, null);
                     }
                 }
             }

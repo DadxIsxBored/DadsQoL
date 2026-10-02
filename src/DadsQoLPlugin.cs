@@ -15,7 +15,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.10";
+    public const string PluginVersion = "1.3.11";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -221,7 +221,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     }
 }
 
-[HarmonyPatch(typeof(Player), nameof(Player.Awake))]
+[HarmonyPatch(typeof(Player), "Awake")]
 internal static class PlayerAwakePatch
 {
     private sealed class OriginalRange
@@ -344,7 +344,7 @@ internal static class EquipmentInWaterPatch
 {
     private static IEnumerable<MethodBase> TargetMethods()
     {
-        yield return AccessTools.Method(typeof(Humanoid), nameof(Humanoid.UpdateEquipment), new[] { typeof(float) });
+        yield return AccessTools.Method(typeof(Humanoid), "UpdateEquipment", new[] { typeof(float) });
         yield return AccessTools.Method(typeof(Humanoid), nameof(Humanoid.EquipItem), new[] { typeof(ItemDrop.ItemData), typeof(bool) });
     }
 
