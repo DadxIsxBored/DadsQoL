@@ -59,7 +59,11 @@ internal static class EternalFuel
             return;
         }
 
-        view.GetZDO().Set(ZDOVars.s_fuel, maximumFuel);
+        ZDO zdo = view.GetZDO();
+        if (zdo.GetFloat(ZDOVars.s_fuel) != maximumFuel)
+        {
+            zdo.Set(ZDOVars.s_fuel, maximumFuel);
+        }
     }
 
     private static HashSet<string> CustomPrefabs()

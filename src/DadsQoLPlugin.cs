@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using BepInEx;
 using BepInEx.Configuration;
@@ -261,6 +262,40 @@ internal static class AutoPickupCapacityPatch
     private static float _nextLargeRadiusScan;
     private static float _lastLargeRadiusScan = -1f;
 
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        MethodInfo overlap = AccessTools.Method(typeof(Physics), nameof(Physics.OverlapSphereNonAlloc),
+            new[] { typeof(Vector3), typeof(float), typeof(Collider[]), typeof(int) });
+        MethodInfo scan = AccessTools.Method(typeof(AutoPickupCapacityPatch), nameof(ScanPickupColliders));
+        foreach (CodeInstruction instruction in instructions)
+        {
+            if (instruction.Calls(overlap))
+            {
+                yield return new CodeInstruction(OpCodes.Ldarg_0);
+                instruction.opcode = OpCodes.Call;
+                instruction.operand = scan;
+            }
+            yield return instruction;
+        }
+    }
+
+    private static int ScanPickupColliders(Vector3 position, float radius, Collider[] buffer, int mask, Player player)
+    {
+        if (buffer == null || buffer.Length == 0)
+        {
+            buffer = new Collider[100];
+            PickupColliders(player) = buffer;
+        }
+        int count = Physics.OverlapSphereNonAlloc(position, radius, buffer, mask);
+        while (count == buffer.Length && buffer.Length < 65536)
+        {
+            buffer = new Collider[buffer.Length * 2];
+            PickupColliders(player) = buffer;
+            count = Physics.OverlapSphereNonAlloc(position, radius, buffer, mask);
+        }
+        return count;
+    }
+
     private static bool Prefix(Player __instance, ref float __0, out float __state)
     {
         __state = __instance != null ? __instance.m_autoPickupRange : 0f;
@@ -295,7 +330,7 @@ internal static class AutoPickupCapacityPatch
 
         if (__instance.m_autoPickupRange > 32f)
         {
-            if (Time.unscaledTime < _nextLargeRadiusScan)
+            if (Time.unscaledTime < _nextLargeRadiusScan && Time.unscaledTime >= _lastLargeRadiusScan)
             {
                 __instance.m_autoPickupRange = 12f;
             }
@@ -307,7 +342,7 @@ internal static class AutoPickupCapacityPatch
                 _lastLargeRadiusScan = now;
                 _nextLargeRadiusScan = now + 0.5f;
                 ref Collider[] colliders = ref PickupColliders(__instance);
-                if (colliders == null || colliders.Length < 4096)
+                if (colliders.Length < 4096)
                     colliders = new Collider[4096];
             }
         }

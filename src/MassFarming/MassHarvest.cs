@@ -13,6 +13,7 @@ internal static class MassHarvest
     private static readonly FieldInfo InteractMaskField = AccessTools.Field(typeof(Player), "m_interactMask");
     private static readonly MethodInfo ExtractMethod = AccessTools.Method(typeof(Beehive), "Extract", System.Type.EmptyTypes);
     private static bool _processingMassInteraction;
+    private static Collider[] _colliders = new Collider[64];
 
     private static void Prefix(Player __instance, GameObject go, bool hold, bool alt)
     {
@@ -29,7 +30,13 @@ internal static class MassHarvest
         Interactable interactable = go.GetComponentInParent<Interactable>();
         float radius = Mathf.Max(0f, DadsQoLPlugin.MassHarvestRadius.Value);
         int interactMask = (int)InteractMaskField.GetValue(__instance);
-        Collider[] colliders = Physics.OverlapSphere(go.transform.position, radius, interactMask);
+        int colliderCount;
+        do
+        {
+            colliderCount = Physics.OverlapSphereNonAlloc(go.transform.position, radius, _colliders, interactMask);
+            if (colliderCount < _colliders.Length) break;
+            System.Array.Resize(ref _colliders, _colliders.Length * 2);
+        } while (true);
 
         _processingMassInteraction = true;
         try
@@ -40,8 +47,9 @@ internal static class MassHarvest
                     ? targetedPickable.m_itemPrefab.name
                     : string.Empty;
 
-                foreach (Collider collider in colliders)
+                for (int index = 0; index < colliderCount; index++)
                 {
+                    Collider collider = _colliders[index];
                     Pickable? nearbyPickable = collider != null
                         ? collider.gameObject.GetComponentInParent<Pickable>()
                         : null;
@@ -56,8 +64,9 @@ internal static class MassHarvest
             }
             else if (interactable is Beehive targetedBeehive)
             {
-                foreach (Collider collider in colliders)
+                for (int index = 0; index < colliderCount; index++)
                 {
+                    Collider collider = _colliders[index];
                     Beehive? nearbyBeehive = collider != null
                         ? collider.gameObject.GetComponentInParent<Beehive>()
                         : null;
@@ -72,6 +81,7 @@ internal static class MassHarvest
         }
         finally
         {
+            System.Array.Clear(_colliders, 0, colliderCount);
             _processingMassInteraction = false;
         }
     }

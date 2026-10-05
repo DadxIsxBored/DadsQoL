@@ -25,6 +25,8 @@ internal static class MassPlantingState
     internal static bool PlaceSuccessful;
     internal static int? SavedRotation;
     internal static GameObject[] PlacementGhosts = new GameObject[1];
+    internal static Piece[] PlacementGhostPieces = new Piece[1];
+    private static readonly List<Material> GhostMaterials = new();
     internal static Piece FakeResourcePiece = null!;
     internal static readonly int PlantSpaceMask = LayerMask.GetMask(
         "Default",
@@ -78,7 +80,7 @@ internal static class MassPlantingState
     internal static bool HasGrowSpace(Vector3 position, GameObject prefab)
     {
         Plant plant = prefab.GetComponent<Plant>();
-        return plant == null || Physics.OverlapSphere(position, plant.m_growRadius, PlantSpaceMask).Length == 0;
+        return plant == null || !Physics.CheckSphere(position, plant.m_growRadius, PlantSpaceMask);
     }
 
     internal static bool EnsureGhostsBuilt(Player player)
@@ -90,6 +92,7 @@ internal static class MassPlantingState
         {
             DestroyGhosts();
             PlacementGhosts = new GameObject[requiredSize];
+            PlacementGhostPieces = new Piece[requiredSize];
 
             PieceTable? pieceTable = BuildPieces(player);
             GameObject? prefab = pieceTable != null ? pieceTable.GetSelectedPrefab() : null;
@@ -101,12 +104,13 @@ internal static class MassPlantingState
             for (int index = 0; index < PlacementGhosts.Length; index++)
             {
                 PlacementGhosts[index] = CreateGhost(prefab);
+                PlacementGhostPieces[index] = PlacementGhosts[index].GetComponent<Piece>();
             }
         }
 
         if (FakeResourcePiece == null)
         {
-            FakeResourcePiece = PlacementGhosts[0].GetComponent<Piece>();
+            FakeResourcePiece = PlacementGhostPieces[0];
             FakeResourcePiece.m_dlc = string.Empty;
             FakeResourcePiece.m_resources = new[] { new Piece.Requirement() };
         }
@@ -123,7 +127,16 @@ internal static class MassPlantingState
                 UnityEngine.Object.Destroy(ghost);
             }
         }
+        foreach (Material material in GhostMaterials)
+        {
+            if (material != null)
+            {
+                UnityEngine.Object.Destroy(material);
+            }
+        }
+        GhostMaterials.Clear();
         FakeResourcePiece = null!;
+        PlacementGhostPieces = new Piece[1];
     }
 
     internal static void SetGhostsActive(bool active)
@@ -198,6 +211,7 @@ internal static class MassPlantingState
                 material.SetFloat("_RippleDistance", 0f);
                 material.SetFloat("_ValueNoise", 0f);
                 materials[index] = material;
+                GhostMaterials.Add(material);
             }
             renderer.sharedMaterials = materials;
             renderer.shadowCastingMode = ShadowCastingMode.Off;
@@ -402,37 +416,39 @@ internal static class UpdatePlacementGhostPatch
         }
 
         float stamina = __instance.GetStamina();
-        List<Vector3> positions = MassPlantingState.BuildGridPositions(
-            mainGhost.transform.position,
-            plant,
-            mainGhost.transform.rotation).ToList();
-
-        for (int index = 0; index < MassPlantingState.PlacementGhosts.Length; index++)
+        bool noPlacementCost = MassPlantingState.NoPlacementCost(__instance);
+        Vector3 origin = mainGhost.transform.position;
+        Quaternion rotation = mainGhost.transform.rotation;
+        int index = 0;
+        foreach (Vector3 position in MassPlantingState.BuildGridPositions(
+                     origin,
+                     plant,
+                     rotation))
         {
             GameObject ghost = MassPlantingState.PlacementGhosts[index];
-            Vector3 position = positions[index];
-            if (mainGhost.transform.position == position)
+            Piece ghostPiece = MassPlantingState.PlacementGhostPieces[index++];
+            if (origin == position)
             {
-                ghost.SetActive(false);
+                if (ghost.activeSelf) ghost.SetActive(false);
                 continue;
             }
 
             MassPlantingState.FakeResourcePiece.m_resources[0].m_amount += requirement.m_amount;
             ghost.transform.position = position;
-            ghost.transform.rotation = mainGhost.transform.rotation;
-            ghost.SetActive(true);
+            ghost.transform.rotation = rotation;
+            if (!ghost.activeSelf) ghost.SetActive(true);
 
             bool invalid = (mainPiece.m_cultivatedGroundOnly && !heightmap.IsCultivated(position)) ||
                            !MassPlantingState.HasGrowSpace(position, mainGhost) ||
                            (!DadsQoLPlugin.IgnorePlantingStamina.Value &&
                             stamina < tool.m_shared.m_attack.m_attackStamina) ||
-                           (!MassPlantingState.NoPlacementCost(__instance) &&
+                           (!noPlacementCost &&
                             !__instance.HaveRequirements(
                                 MassPlantingState.FakeResourcePiece,
                                 Player.RequirementMode.CanBuild));
 
             stamina -= tool.m_shared.m_attack.m_attackStamina;
-            ghost.GetComponent<Piece>().SetInvalidPlacementHeightlight(invalid);
+            ghostPiece.SetInvalidPlacementHeightlight(invalid);
         }
     }
 }
