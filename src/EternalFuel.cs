@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BepInEx.Configuration;
 using HarmonyLib;
 
@@ -8,6 +9,8 @@ namespace DadsQoL;
 
 internal static class EternalFuel
 {
+    private sealed class CachedName { internal string Value = string.Empty; }
+    private static readonly ConditionalWeakTable<UnityEngine.Component, CachedName> PrefabNames = new();
     private static string _customPrefabSource = string.Empty;
     private static HashSet<string> _customPrefabs = new(StringComparer.OrdinalIgnoreCase);
 
@@ -38,12 +41,17 @@ internal static class EternalFuel
             return false;
         }
 
-        string prefabName = component.gameObject.name;
-        const string cloneSuffix = "(Clone)";
-        if (prefabName.EndsWith(cloneSuffix, StringComparison.OrdinalIgnoreCase))
+        string prefabName = PrefabNames.GetValue(component, current =>
         {
-            prefabName = prefabName.Substring(0, prefabName.Length - cloneSuffix.Length);
-        }
+            string name = current.gameObject.name;
+            const string suffix = "(Clone)";
+            return new CachedName
+            {
+                Value = name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)
+                    ? name.Substring(0, name.Length - suffix.Length)
+                    : name
+            };
+        }).Value;
         if (BuiltInPrefabs.TryGetValue(prefabName, out Func<bool>? enabled))
         {
             return enabled();

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.13
+
+- general optimisations
+
+## 1.3.12
+
+- General performance optimizations.
+
 ## 1.3.11
 
 - Fixed mass-harvest access to Valheim's private beehive extraction method using cached reflection.

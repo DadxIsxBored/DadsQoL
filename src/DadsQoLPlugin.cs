@@ -16,7 +16,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.11";
+    public const string PluginVersion = "1.3.13";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -259,8 +259,12 @@ internal static class AutoPickupCapacityPatch
 {
     private static readonly AccessTools.FieldRef<Player, Collider[]> PickupColliders =
         AccessTools.FieldRefAccess<Player, Collider[]>("m_colliders");
-    private static float _nextLargeRadiusScan;
-    private static float _lastLargeRadiusScan = -1f;
+    private static readonly FieldInfo ItemInstancesField = AccessTools.Field(typeof(ItemDrop), "s_instances");
+    private static readonly FieldInfo AutoPickupEnabledField = AccessTools.Field(typeof(Player), "m_enableAutoPickup");
+    private static Player? _remoteScanPlayer;
+    private static int _remoteScanIndex;
+    private static float _lastRemotePass;
+    private static float _remoteMoveDelta;
 
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
@@ -330,24 +334,71 @@ internal static class AutoPickupCapacityPatch
 
         if (__instance.m_autoPickupRange > 32f)
         {
-            if (Time.unscaledTime < _nextLargeRadiusScan && Time.unscaledTime >= _lastLargeRadiusScan)
-            {
-                __instance.m_autoPickupRange = 12f;
-            }
-            else
-            {
-                float now = Time.unscaledTime;
-                if (_lastLargeRadiusScan >= 0f)
-                    __0 = Mathf.Max(__0, Mathf.Min(now - _lastLargeRadiusScan, 0.6f));
-                _lastLargeRadiusScan = now;
-                _nextLargeRadiusScan = now + 0.5f;
-                ref Collider[] colliders = ref PickupColliders(__instance);
-                if (colliders.Length < 4096)
-                    colliders = new Collider[4096];
-            }
+            ScanDistantItems(__instance, inventory);
+            __instance.m_autoPickupRange = 12f;
         }
 
         return true;
+    }
+
+    private static void ScanDistantItems(Player player, Inventory inventory)
+    {
+        if (!(bool)AutoPickupEnabledField.GetValue(null) || player.IsTeleporting()) return;
+        List<ItemDrop>? items = ItemInstancesField.GetValue(null) as List<ItemDrop>;
+        if (items == null || items.Count == 0) return;
+
+        float now = Time.unscaledTime;
+        if (_remoteScanPlayer != player || now < _lastRemotePass)
+        {
+            _remoteScanPlayer = player;
+            _remoteScanIndex = 0;
+            _lastRemotePass = now;
+            _remoteMoveDelta = Time.fixedDeltaTime;
+        }
+        if (_remoteScanIndex >= items.Count)
+        {
+            _remoteScanIndex = 0;
+            _remoteMoveDelta = Mathf.Min(now - _lastRemotePass, 0.6f);
+            _lastRemotePass = now;
+        }
+
+        Vector3 pickupPoint = player.transform.position + Vector3.up;
+        float radiusSquared = player.m_autoPickupRange * player.m_autoPickupRange;
+        float carriedWeight = -1f;
+        float maximumWeight = 0f;
+        for (int processed = 0; processed < 64 && _remoteScanIndex < items.Count; processed++)
+        {
+            ItemDrop item = items[_remoteScanIndex++];
+            if (item == null || !item.m_autoPickup) continue;
+
+            Vector3 itemPosition = item.transform.position;
+            Vector3 offset = pickupPoint - itemPosition;
+            float distanceSquared = offset.sqrMagnitude;
+            if (distanceSquared <= 144f || distanceSquared > radiusSquared) continue;
+            if (item.IsPiece() || player.HaveUniqueKey(item.m_itemData.m_shared.m_name)) continue;
+
+            ZNetView view = item.GetComponent<ZNetView>();
+            if (view == null || !view.IsValid()) continue;
+            if (!item.CanPickup(true))
+            {
+                item.RequestOwn();
+                continue;
+            }
+            if (item.InTar()) continue;
+            item.Load();
+            if (!inventory.CanAddItem(item.m_itemData, -1)) continue;
+            if (carriedWeight < 0f)
+            {
+                carriedWeight = inventory.GetTotalWeight();
+                maximumWeight = player.GetMaxCarryWeight();
+            }
+            if (carriedWeight + item.m_itemData.GetWeight(-1) > maximumWeight) continue;
+
+            float distance = Mathf.Sqrt(distanceSquared);
+            float step = Mathf.Min(15f * _remoteMoveDelta, distance - 11f);
+            if (step > 0f)
+                item.transform.position = itemPosition + offset * (step / distance);
+        }
     }
 
     private static void Postfix(Player __instance, float __state)
