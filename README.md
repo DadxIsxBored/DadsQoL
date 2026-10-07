@@ -4,6 +4,7 @@ DadsQoL combines configurable Valheim quality-of-life features in one Valheim 1.
 
 - Configurable base carry weight, default `5000` (`300` is vanilla).
 - Configurable automatic pickup radius, default `6` meters (`2` is vanilla).
+- Fish attraction has its own `Attract Fish` switch under `3 - Pickup Radius`. It defaults to off, so automatic pickup does not pull fish behind the player; manual fish pickup remains available.
 - Equipment, tools, weapons, bows, and shields remain usable while swimming.
 - Hold `Left Shift` or controller `Left Bumper` while interacting to harvest matching nearby pickables or extract nearby beehives.
 - Hold the same shortcut while planting to place a configurable grid, default `5x5`, with placement previews.

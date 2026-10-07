@@ -24,6 +24,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     internal static ConfigEntry<float> CarryWeight = null!;
     internal static ConfigEntry<bool> PickupRadiusEnabled = null!;
     internal static ConfigEntry<float> PickupRadius = null!;
+    internal static ConfigEntry<bool> AttractFish = null!;
     internal static ConfigEntry<bool> EquipmentInWaterEnabled = null!;
     internal static ConfigEntry<bool> MassFarmingEnabled = null!;
     internal static ConfigEntry<KeyboardShortcut> MassFarmingKeyboardShortcut = null!;
@@ -86,6 +87,11 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
             "Radius",
             6f,
             "Automatic pickup radius in meters. Vanilla is 2.");
+        AttractFish = Config.Bind(
+            "3 - Pickup Radius",
+            "Attract Fish",
+            false,
+            "Allow automatic pickup to pull fish toward the player. Turn off to keep fish from following behind you; fish can still be picked up manually.");
 
         EquipmentInWaterEnabled = Config.Bind(
             "4 - Equipment In Water",
@@ -297,7 +303,34 @@ internal static class AutoPickupCapacityPatch
             PickupColliders(player) = buffer;
             count = Physics.OverlapSphereNonAlloc(position, radius, buffer, mask);
         }
+        if (!DadsQoLPlugin.AttractFish.Value)
+        {
+            int retained = 0;
+            for (int index = 0; index < count; index++)
+            {
+                Collider collider = buffer[index];
+                if (collider == null || IsFish(collider)) continue;
+                buffer[retained++] = collider;
+            }
+            for (int index = retained; index < count; index++) buffer[index] = null!;
+            count = retained;
+        }
         return count;
+    }
+
+    private static bool IsFish(Collider collider)
+    {
+        if (collider.GetComponentInParent<Fish>() != null) return true;
+        ItemDrop item = collider.GetComponentInParent<ItemDrop>();
+        return item != null && IsFish(item);
+    }
+
+    private static bool IsFish(ItemDrop item)
+    {
+        if (item.GetComponent<Fish>() != null) return true;
+        ItemDrop.ItemData itemData = item.m_itemData;
+        return itemData != null && itemData.m_dropPrefab != null &&
+               itemData.m_dropPrefab.GetComponent<Fish>() != null;
     }
 
     private static bool Prefix(Player __instance, ref float __0, out float __state)
@@ -369,7 +402,8 @@ internal static class AutoPickupCapacityPatch
         for (int processed = 0; processed < 64 && _remoteScanIndex < items.Count; processed++)
         {
             ItemDrop item = items[_remoteScanIndex++];
-            if (item == null || !item.m_autoPickup) continue;
+            if (item == null || item.m_itemData == null || !item.m_autoPickup) continue;
+            if (!DadsQoLPlugin.AttractFish.Value && IsFish(item)) continue;
 
             Vector3 itemPosition = item.transform.position;
             Vector3 offset = pickupPoint - itemPosition;

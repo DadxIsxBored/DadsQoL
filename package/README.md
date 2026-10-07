@@ -4,6 +4,7 @@ One configurable plugin for Valheim 1.0.16:
 
 - Base carry weight: `5000` by default.
 - Automatic pickup radius: `6` meters by default.
+- `Attract Fish` under `3 - Pickup Radius` defaults to off; turn it on to allow automatic pickup to pull fish toward the player.
 - Hand equipment remains usable while swimming.
 - Hold `Left Shift` or controller `Left Bumper` while interacting to harvest matching nearby pickables and beehives.
 - Hold the same shortcut while planting to place a configurable grid, default `5x5`, with placement previews.
