@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.14
+
+- Add a separate automatic pickup switch for fish, off by default, so fish do not trail the player.
+
 ## 1.3.13
 
 - general optimisations
