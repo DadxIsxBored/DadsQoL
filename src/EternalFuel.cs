@@ -31,6 +31,7 @@ internal static class EternalFuel
         ["piece_bathtub"] = () => DadsQoLPlugin.EternalHotTubs.Value,
         ["smelter"] = () => DadsQoLPlugin.EternalSmelters.Value,
         ["blastfurnace"] = () => DadsQoLPlugin.EternalBlastFurnaces.Value,
+        ["piece_FrostFoundry"] = () => DadsQoLPlugin.EternalFrostFoundries.Value,
         ["eitrrefinery"] = () => DadsQoLPlugin.EternalEitrRefineries.Value
     };
 

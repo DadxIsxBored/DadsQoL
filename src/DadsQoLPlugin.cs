@@ -16,7 +16,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.14";
+    public const string PluginVersion = "1.3.15";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -52,6 +52,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     internal static ConfigEntry<bool> EternalHotTubs = null!;
     internal static ConfigEntry<bool> EternalSmelters = null!;
     internal static ConfigEntry<bool> EternalBlastFurnaces = null!;
+    internal static ConfigEntry<bool> EternalFrostFoundries = null!;
     internal static ConfigEntry<bool> EternalEitrRefineries = null!;
     internal static ConfigEntry<string> EternalCustomPrefabs = null!;
 
@@ -166,6 +167,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
         EternalHotTubs = Config.Bind("6 - Eternal Fuel", "Hot Tubs", true, "Keep hot tubs fueled.");
         EternalSmelters = Config.Bind("6 - Eternal Fuel", "Smelters", false, "Keep smelters fueled.");
         EternalBlastFurnaces = Config.Bind("6 - Eternal Fuel", "Blast Furnaces", false, "Keep blast furnaces fueled.");
+        EternalFrostFoundries = Config.Bind("6 - Eternal Fuel", "Frost Foundries", false, "Keep frost foundries fueled.");
         EternalEitrRefineries = Config.Bind("6 - Eternal Fuel", "Eitr Refineries", false, "Keep eitr refineries fueled.");
         EternalCustomPrefabs = Config.Bind(
             "6 - Eternal Fuel",

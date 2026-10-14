@@ -8,7 +8,7 @@ DadsQoL combines configurable Valheim quality-of-life features in one Valheim 1.
 - Equipment, tools, weapons, bows, and shields remain usable while swimming.
 - Hold `Left Shift` or controller `Left Bumper` while interacting to harvest matching nearby pickables or extract nearby beehives.
 - Hold the same shortcut while planting to place a configurable grid, default `5x5`, with placement previews.
-- Configurable eternal fuel for campfires, bonfires, hearths, sconces, standing torches, braziers, jack-o-turnips, stone ovens, hot tubs, smelters, blast furnaces, eitr refineries, and custom prefab names.
+- Configurable eternal fuel for campfires, bonfires, hearths, sconces, standing torches, braziers, jack-o-turnips, stone ovens, hot tubs, smelters, blast furnaces, Frost Foundries, eitr refineries, and custom prefab names.
 
 Every feature has its own switch. A master switch controls the complete plugin. Mass farming includes configurable shortcuts, harvest radius, planting-grid dimensions, grid anchoring, stamina use, and durability use. Eternal fuel has separate controls for every supported piece group; smelters, blast furnaces, and eitr refineries default to disabled.
 
