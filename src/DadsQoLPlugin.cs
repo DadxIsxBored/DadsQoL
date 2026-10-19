@@ -16,7 +16,7 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 {
     public const string PluginGuid = "com.dadisbored.dadsqol";
     public const string PluginName = "DadsQoL";
-    public const string PluginVersion = "1.3.15";
+    public const string PluginVersion = "1.4.0";
 
     internal static ConfigEntry<bool> ModEnabled = null!;
     internal static ManualLogSource ModLog = null!;
@@ -55,6 +55,8 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
     internal static ConfigEntry<bool> EternalFrostFoundries = null!;
     internal static ConfigEntry<bool> EternalEitrRefineries = null!;
     internal static ConfigEntry<string> EternalCustomPrefabs = null!;
+    internal static ConfigEntry<bool> SharedRecipes = null!;
+    internal static ConfigEntry<bool> AutomaticMapSharing = null!;
 
     private Harmony? _harmony;
 
@@ -175,6 +177,11 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
             string.Empty,
             "Comma-separated exact prefab names whose Fireplace, CookingStation, or Smelter fuel must remain full.");
 
+        SharedRecipes = Config.Bind("7 - Multiplayer", "Shared Recipes", true,
+            "Share discovered crafting recipes with everyone in the world.");
+        AutomaticMapSharing = Config.Bind("7 - Multiplayer", "Automatic Map Sharing", true,
+            "Automatically share explored map areas with everyone in the world.");
+
         ModEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadiusEnabled.SettingChanged += OnPickupSettingChanged;
         PickupRadius.SettingChanged += OnPickupSettingChanged;
@@ -194,8 +201,14 @@ public sealed class DadsQoLPlugin : BaseUnityPlugin
 
     private void OnDestroy()
     {
+        MultiplayerSharing.Reset();
         MassFarming.MassPlantingState.DestroyGhosts();
         _harmony?.UnpatchSelf();
+    }
+
+    private void Update()
+    {
+        MultiplayerSharing.Update();
     }
 
     internal static bool FeatureEnabled(ConfigEntry<bool> feature)

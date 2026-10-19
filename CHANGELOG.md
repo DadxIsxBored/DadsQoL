@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0
+
+- Added a Multiplayer config section with separate switches for shared crafting and building recipes and automatic explored map sharing.
+- Added server relaying and world-specific saved discoveries for current players and later joiners.
+
 ## 1.3.15
 
 - Added a separate Eternal Fuel switch for Frost Foundries.
